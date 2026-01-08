@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2016-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -534,6 +534,7 @@ val_pcie_create_device_bdf_table()
   uint32_t status;
   uint32_t dp_type;
 
+  val_print(ACS_PRINT_ERR, "\n       Creating PCIe Device BDF Table\n", 0);
   /* if table is already present, return success */
   if (g_pcie_bdf_table)
       return PCIE_SUCCESS;
@@ -608,6 +609,7 @@ val_pcie_create_device_bdf_table()
                       val_pcie_enable_msa(bdf);
 #endif
 
+                      val_print(ACS_PRINT_ERR, "\n       Legacy PCI device detection\n", 0);
                       /* Skip if the device is a PCI legacy device */
                       p_cap = val_pcie_find_capability(
                         bdf,
@@ -628,6 +630,7 @@ val_pcie_create_device_bdf_table()
                           continue;
                       }
 
+                      val_print(ACS_PRINT_ERR, "\n       Device port type detection", 0);
                       dp_type = val_pcie_device_port_type(bdf);
 
                       /* RCiEP rules are for SBSA L6 */
@@ -645,6 +648,7 @@ val_pcie_create_device_bdf_table()
       }
   }
 
+  val_print(ACS_PRINT_ERR, "\n       PCIe Device BDF Table Created Successfully\n", 0);
   /* Sanity Check : Confirm all EP (normal, integrated) have a rootport */
   val_pcie_populate_device_rootport();
 
@@ -952,10 +956,13 @@ val_pcie_find_capability(uint32_t bdf, uint32_t cid_type, uint32_t cid, uint32_t
   uint32_t next_cap_offset;
   uint32_t ret;
 
+  val_print(ACS_PRINT_ERR, "\n       BDF 0x%x", bdf);
+  val_print(ACS_PRINT_ERR, " - Searching for Capability ID 0x%x", cid);
   if (cid_type == PCIE_CAP) {
 
       /* Serach in PCIe configuration space */
       ret = val_pcie_read_cfg(bdf, TYPE01_CPR, &reg_value);
+      val_print(ACS_PRINT_ERR, "\n       Cap Ptr Reg Value 0x%x", reg_value);
       if (ret == PCIE_NO_MAPPING || reg_value == PCIE_UNKNOWN_RESPONSE)
           return ret;
 
@@ -968,6 +975,9 @@ val_pcie_find_capability(uint32_t bdf, uint32_t cid_type, uint32_t cid, uint32_t
               *cid_offset = next_cap_offset;
               return PCIE_SUCCESS;
           }
+
+          val_print(ACS_PRINT_ERR,
+                        "\n       Next Cap Offset 0x%x", ((reg_value >> PCIE_NCPR_SHIFT) & 0xFF));
           next_cap_offset = ((reg_value >> PCIE_NCPR_SHIFT) & PCIE_NCPR_MASK);
       }
   } else if (cid_type == PCIE_ECAP)
@@ -983,6 +993,8 @@ val_pcie_find_capability(uint32_t bdf, uint32_t cid_type, uint32_t cid, uint32_t
               *cid_offset = next_cap_offset;
               return PCIE_SUCCESS;
           }
+          val_print(ACS_PRINT_ERR,
+                "\n       Next ECap Offset 0x%x", ((reg_value >> PCIE_ECAP_NCPR_SHIFT) & 0xFFF));
           next_cap_offset = ((reg_value >> PCIE_ECAP_NCPR_SHIFT) & PCIE_ECAP_NCPR_MASK);
       }
   }

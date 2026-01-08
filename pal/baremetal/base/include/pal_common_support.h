@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2020-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2020-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,7 +87,7 @@ void *mem_alloc(size_t alignment, size_t size);
 
 /* TYPE 0/1 Cmn Cfg reg offsets and mask*/
 #define TYPE01_CPR           0x34
-#define TYPE01_CPR_MASK      0xff
+#define TYPE01_CPR_MASK      0xFC
 #define COMMAND_REG_OFFSET   0x04
 #define REG_ACC_DATA         0x7
 
