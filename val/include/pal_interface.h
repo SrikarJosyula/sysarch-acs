@@ -191,6 +191,7 @@ typedef struct {
 **/
 typedef struct {
   uint64_t ttbr0;      ///< Translation Table Base Register 0
+  uint64_t ttbr1;      ///< Translation Table Base Register 1
   uint64_t tcr;        ///< Translation Control Register
   uint64_t mair;       ///< Memory Attribute Indirection Register
   uint64_t sctlr;      ///< System Control Register

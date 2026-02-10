@@ -30,10 +30,11 @@ ASM_PFX(StackSize):  .8byte 0x100
 
 // PE_MMU_CONFIG structure offsets
 .equ MMU_CFG_TTBR0,     0
-.equ MMU_CFG_TCR,       8
-.equ MMU_CFG_MAIR,      16
-.equ MMU_CFG_SCTLR,     24
-.equ MMU_CFG_EL,        32
+.equ MMU_CFG_TTBR1,     8
+.equ MMU_CFG_TCR,       16
+.equ MMU_CFG_MAIR,      24
+.equ MMU_CFG_SCTLR,     32
+.equ MMU_CFG_EL,        40
 
 // SCTLR bits
 .equ SCTLR_M_BIT,       (1 << 0)   // MMU enable
@@ -57,10 +58,11 @@ _EnableMmu:
 
   // Load all config values from the structure
   ldr   x12, [x11, #MMU_CFG_TTBR0]  // TTBR0
-  ldr   x13, [x11, #MMU_CFG_TCR]    // TCR
-  ldr   x14, [x11, #MMU_CFG_MAIR]   // MAIR
-  ldr   x15, [x11, #MMU_CFG_SCTLR]  // SCTLR
-  ldr   w16, [x11, #MMU_CFG_EL]     // Current EL (32-bit)
+  ldr   x13, [x11, #MMU_CFG_TTBR1]  // TTBR1
+  ldr   x14, [x11, #MMU_CFG_TCR]    // TCR
+  ldr   x15, [x11, #MMU_CFG_MAIR]   // MAIR
+  ldr   x16, [x11, #MMU_CFG_SCTLR]  // SCTLR
+  ldr   w17, [x11, #MMU_CFG_EL]     // Current EL (32-bit)
 
   // Determine current exception level
   mrs   x17, CurrentEL
@@ -77,17 +79,19 @@ _SetupMmuEl1:
   dsb   sy
   isb
 
-  // Set MAIR, TCR, TTBR0 for EL1
-  msr   mair_el1, x14
+  // Set MAIR, TCR, TTBR0, TTBR1 for EL1
+  msr   mair_el1, x15
   isb
-  msr   tcr_el1, x13
+  msr   tcr_el1, x14
   isb
   msr   ttbr0_el1, x12
+  isb
+  msr   ttbr1_el1, x13
   isb
 
   // Enable MMU and caches for EL1
   // Use the same SCTLR value as primary PE (which has M, C, I bits set)
-  msr   sctlr_el1, x15
+  msr   sctlr_el1, x16
   isb
   b     _MmuEnabled
 
@@ -97,17 +101,19 @@ _SetupMmuEl2:
   dsb   sy
   isb
 
-  // Set MAIR, TCR, TTBR0 for EL2
-  msr   mair_el2, x14
+  // Set MAIR, TCR, TTBR0, TTBR1 for EL2
+  msr   mair_el2, x15
   isb
-  msr   tcr_el2, x13
+  msr   tcr_el2, x14
   isb
   msr   ttbr0_el2, x12
+  isb
+  msr   ttbr1_el2, x13
   isb
 
   // Enable MMU and caches for EL2
   // Use the same SCTLR value as primary PE (which has M, C, I bits set)
-  msr   sctlr_el2, x15
+  msr   sctlr_el2, x16
   isb
 
 _MmuEnabled:

@@ -44,6 +44,8 @@ static PE_MMU_CONFIG gMmuConfig __attribute__((aligned(64)));
 UINT64 AA64ReadCurrentEL(VOID);
 UINT64 AA64ReadTtbr0El1(VOID);
 UINT64 AA64ReadTtbr0El2(VOID);
+UINT64 AA64ReadTtbr1El1(VOID);
+UINT64 AA64ReadTtbr1El2(VOID);
 UINT64 AA64ReadTcr1(VOID);
 UINT64 AA64ReadTcr2(VOID);
 UINT64 AA64ReadMair1(VOID);
@@ -224,7 +226,7 @@ PalGetMaxMpidr()
 
 /**
   @brief   Captures the primary PE's MMU configuration for use by secondary PEs.
-           This function reads TTBR0, TCR, MAIR, and SCTLR from the current EL
+           This function reads TTBR0, TTBR1, TCR, MAIR, and SCTLR from the current EL
            and stores them in a global structure that secondary PEs can access.
 
   @param   None
@@ -243,12 +245,14 @@ PalCaptureMmuConfig(VOID)
   /* Read MMU configuration registers based on current EL */
   if (CurrentEl == 2) {
     gMmuConfig.ttbr0 = AA64ReadTtbr0El2();
+    gMmuConfig.ttbr1 = AA64ReadTtbr1El2();
     gMmuConfig.tcr   = AA64ReadTcr2();
     gMmuConfig.mair  = AA64ReadMair2();
     gMmuConfig.sctlr = AA64ReadSctlr2();
   } else {
     /* Assume EL1 */
     gMmuConfig.ttbr0 = AA64ReadTtbr0El1();
+    gMmuConfig.ttbr1 = AA64ReadTtbr1El1();
     gMmuConfig.tcr   = AA64ReadTcr1();
     gMmuConfig.mair  = AA64ReadMair1();
     gMmuConfig.sctlr = AA64ReadSctlr1();
@@ -256,6 +260,7 @@ PalCaptureMmuConfig(VOID)
 
   acs_print(ACS_PRINT_INFO, L"  MMU Config captured at EL%d\n", gMmuConfig.current_el);
   acs_print(ACS_PRINT_DEBUG, L"    TTBR0: 0x%lx\n", gMmuConfig.ttbr0);
+  acs_print(ACS_PRINT_DEBUG, L"    TTBR1: 0x%lx\n", gMmuConfig.ttbr1);
   acs_print(ACS_PRINT_DEBUG, L"    TCR:   0x%lx\n", gMmuConfig.tcr);
   acs_print(ACS_PRINT_DEBUG, L"    MAIR:  0x%lx\n", gMmuConfig.mair);
   acs_print(ACS_PRINT_DEBUG, L"    SCTLR: 0x%lx\n", gMmuConfig.sctlr);
