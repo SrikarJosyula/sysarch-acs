@@ -26,6 +26,8 @@ operating system. VBSA supplements the
 [Arm BSA specification](https://developer.arm.com/documentation/den0094/latest/)
 to target virtual platforms.
 
+Linking Shell.efi to see if the executable changes to HTML [Shell.efi](../../Shell.efi)
+
 See the [VBSA specification](https://developer.arm.com/documentation/den0150/latest/) for the authoritative rules.
 
 ## VBSA - Architecture Compliance Suite
