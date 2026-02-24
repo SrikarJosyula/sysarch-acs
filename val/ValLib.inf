@@ -32,6 +32,7 @@
   src/AArch64/RasSupport.S
   src/AArch64/PmuRegSupport.S
   src/AArch64/Drtm.S
+  src/AArch64/SystemReg.S
   src/AArch64/generic_sysreg_support.S
   src/acs_status.c
   src/acs_pe.c
@@ -79,7 +80,6 @@
   src/mpam_execute_test.c
   src/drtm_execute_test.c
   src/pc_bsa_execute_test.c
-  src/pfdi_execute_test.c
 
 [Packages]
   MdePkg/MdePkg.dec

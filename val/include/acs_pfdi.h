@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2025-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +45,8 @@
 
 #define VAL_PFDI_RESERVED_BYTE_ZERO         0x0
 #define PFDI_ACS_NOT_IMPLEMENTED            0x1
+#define PFDI_INVALID_X_VALUE                0xF
+#define PFDI_RUN_ALL_TEST_PARTS             -1
 
 typedef enum {
     PFDI_ACS_SUCCESS                =  0,
@@ -56,5 +58,17 @@ typedef enum {
     PFDI_ACS_UNKNOWN                = -7,
     PFDI_ACS_TEST_COUNT_ZERO        = -8
 } PFDI_ACS_RET_CODE;
+
+typedef enum {
+    PFDI_FN_VERSION_IDX = 0,
+    PFDI_FN_FEATURES_IDX,
+    PFDI_FN_PE_TEST_ID_IDX,
+    PFDI_FN_PE_TEST_PART_COUNT_IDX,
+    PFDI_FN_PE_TEST_RUN_IDX,
+    PFDI_FN_PE_TEST_RESULT_IDX,
+    PFDI_FN_FW_CHECK_IDX,
+    PFDI_FN_FORCE_ERROR_IDX,
+    PFDI_FN_MAX_IDX
+} PFDI_FN_INDEX;
 
 #endif /* __ACS_PFDI_H */

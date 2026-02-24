@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2016-2018,2020-2021, 2023-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2018,2020-2021, 2023-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ extern char *rule_id_string[RULE_ID_SENTINEL];
 /* Global variables for app */
 int  g_print_level = 3;
 bool g_pcie_skip_dp_nic_ms = 0;
-uint32_t g_level_filter_mode;  /* LEVEL_FILTER_MODE_e */
+uint32_t g_level_filter_mode = LVL_FILTER_MAX;  /* default: filter by max level */
 uint32_t g_level_value = BSA_LEVEL_1; /* Default BSA_LEVEL_1*/
 
 /* Legacy numeric skip support kept inert for compatibility with other files */
@@ -53,12 +53,34 @@ static RULE_ID_e g_skip_rule_buf[BSA_RULE_ID_LIST_MAX];
 unsigned int g_skip_rule_count = 0;
 
 /*  Helpers for rule parsing  */
+static int sizeof_char_ptr(const char *tok)
+{
+  int i = 0;
+
+  if (tok)
+  {
+    while (tok[i] != '\0')
+      i++;
+  }
+  return i;
+
+}
+
 static int rule_id_from_string(const char *tok)
 {
     unsigned int rid;
+    int cmp_len;
+
     if (!tok || !*tok) return -1;
     for (rid = 0; rid < RULE_ID_SENTINEL; rid++) {
-        if (rule_id_string[rid] && strcmp((const char *)rule_id_string[rid], tok) == 0)
+        if (!rule_id_string[rid])
+            continue;
+
+        cmp_len = sizeof_char_ptr(rule_id_string[rid]);
+        if (cmp_len < sizeof_char_ptr(tok))
+            cmp_len = sizeof_char_ptr(tok);
+
+        if (strncmp((const char *)rule_id_string[rid], tok, cmp_len) == 0)
             return (int)rid;
     }
     return -1;
@@ -100,7 +122,7 @@ void print_help(){
             "-r      Comma-separated rule IDs to run (overwrites default rule list) [no spaces]\n"
             "--fr    Run future requirement tests (FR); use without -l\n"
             "--skip  Rules to skip as comma-separated RULE IDs. [no spaces]\n"
-            "--skip-dp-nic-ms Skip PCIe tests for DisplayPort, Network, and Mass Storage devices\n"
+            "--skip-dp-nic-ms Skip PCIe tests for DisplayPort, Network, Mass Storage devices and Unclassified devices\n"
     );
 }
 
@@ -116,7 +138,7 @@ main (int argc, char **argv)
       {"skip", required_argument, NULL, 'n'},
       {"skip-dp-nic-ms", no_argument, NULL, 'c'},
       {"help", no_argument, NULL, 'h'},
-      {"only", required_argument, NULL, 'o'},
+      {"only", no_argument, NULL, 'o'},
       {"fr", no_argument, NULL, 'f'},
       {"rules", required_argument, NULL, 'r'},
       {NULL, 0, NULL, 0}
@@ -138,7 +160,6 @@ main (int argc, char **argv)
          g_level_filter_mode = LVL_FILTER_MAX;
          break;
        case 'o':
-         g_level_value =  strtol(optarg, &endptr, 10);
          g_level_filter_mode = LVL_FILTER_ONLY;
          break;
        case 'f':

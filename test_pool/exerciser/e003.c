@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2020-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2020-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -254,8 +254,9 @@ cfgspace_transactions_order_check(void)
         goto test_skip_unimplemented;
     }
 
-    if (!baseptr) {
+    if (status) {
         val_print(ACS_PRINT_DEBUG, "\n       Failed in config ioremap for instance 0x%x", instance);
+        val_print(ACS_PRINT_DEBUG, "   Status :0x%x", status);
         continue;
     }
 
@@ -329,8 +330,9 @@ barspace_transactions_order_check(void)
         goto test_skip_unimplemented;
     }
 
-    if (!baseptr) {
-        val_print(ACS_PRINT_ERR, "\n       Failed in BAR ioremap for instance 0x%x", instance);
+    if (status) {
+        val_print(ACS_PRINT_DEBUG, "\n       Failed in config ioremap for instance 0x%x", instance);
+        val_print(ACS_PRINT_DEBUG, "   Status :0x%x", status);
         continue;
     }
 

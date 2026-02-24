@@ -15,6 +15,7 @@ wget https://gitlab.arm.com/linux-arm/linux-acs/-/raw/master/acs-drv/files/build
 chmod +x build.sh
 source build.sh [args]
 ```
+**Important:** Build this module against the same kernel version and configuration as the target system. A module built for a different kernel may fail to load ```(invalid module format / vermagic mismatch)```
 
 ### Script arguments
 - `-v`, `--version` — Linux kernel version to build (default: 6.10)

@@ -12,7 +12,7 @@ on:
         description: "edk2 ref/branch/tag to checkout"
         required: false
         type: string
-        default: "edk2-stable202508"
+        default: "edk2-stable202511"
       run-uefi:
         description: "Run UEFI builds"
         required: false
@@ -206,11 +206,13 @@ jobs:
           source edksetup.sh
           make -C BaseTools/Source/C
           source ShellPkg/Application/sysarch-acs/tools/scripts/acsbuild.sh ${{ matrix.target.arg }}
+          build -a AARCH64 -t GCC -p ShellPkg/ShellPkg.dsc -m ShellPkg/Application/Shell/Shell.inf
 
       - name: Move output to toolchain folder
         run: |
           mkdir -p "artifacts/${{ matrix.toolchain }}"
           cp "edk2/Build/Shell/DEBUG_GCC/AARCH64/${{ matrix.target.outfile }}" "artifacts/${{ matrix.toolchain }}/${{ matrix.target.artifact }}"
+          cp "edk2/Build/Shell/DEBUG_GCC/AARCH64/ShellPkg/Application/Shell/Shell/OUTPUT/Shell.efi" "artifacts/${{ matrix.toolchain }}/"
 
       - name: Upload ${{ matrix.target.artifact }}
         uses: actions/upload-artifact@v4

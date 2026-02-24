@@ -184,7 +184,21 @@ typedef struct {
   uint32_t tg_size_log2:5;
 }PE_TCR_BF;
 
+/**
+  @brief  MMU configuration structure for secondary PE initialization
+          This structure holds the primary PE's MMU configuration which
+          is used to enable MMU/caches on secondary PEs.
+**/
+typedef struct {
+  uint64_t ttbr0;      ///< Translation Table Base Register 0
+  uint64_t tcr;        ///< Translation Control Register
+  uint64_t mair;       ///< Memory Attribute Indirection Register
+  uint64_t sctlr;      ///< System Control Register
+  uint32_t current_el; ///< Current Exception Level (1 or 2)
+} PE_MMU_CONFIG;
+
 void pal_pe_create_info_table(PE_INFO_TABLE *pe_info_table);
+uint64_t PalGetMmuConfigAddr(void);
 
 /**
   @brief  Structure to Pass SMC arguments. Return data is also filled into
@@ -619,7 +633,7 @@ typedef struct {
 **/
 typedef struct {
   PERIPHERAL_INFO_HDR     header;
-  PERIPHERAL_INFO_BLOCK   info[]; ///< Array of Information blocks - instantiated for each peripheral
+  PERIPHERAL_INFO_BLOCK   info[]; ///< Array of Information blocks instantiated for each peripheral
 }PERIPHERAL_INFO_TABLE;
 
 void  pal_peripheral_create_info_table(PERIPHERAL_INFO_TABLE *per_info_table);
@@ -645,7 +659,8 @@ typedef struct PERIPHERAL_VECTOR_LIST_STRUCT
   struct PERIPHERAL_VECTOR_LIST_STRUCT *next;
 }PERIPHERAL_VECTOR_LIST;
 
-uint32_t pal_get_msi_vectors (uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn, PERIPHERAL_VECTOR_LIST **mvector);
+uint32_t pal_get_msi_vectors (uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn,
+                              PERIPHERAL_VECTOR_LIST **mvector);
 
 #define LEGACY_PCI_IRQ_CNT 4  // Legacy PCI IRQ A, B, C. and D
 
@@ -660,7 +675,8 @@ typedef struct {
 
 #define DEVCTL_SNOOP_BIT 11        // Device control register no snoop bit
 
-uint32_t pal_pcie_get_legacy_irq_map(uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn, PERIPHERAL_IRQ_MAP *irq_map);
+uint32_t pal_pcie_get_legacy_irq_map(uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn,
+                                     PERIPHERAL_IRQ_MAP *irq_map);
 uint32_t pal_pcie_get_root_port_bdf(uint32_t *seg, uint32_t *bus, uint32_t *dev, uint32_t *func);
 uint32_t pal_pcie_get_snoop_bit(uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn);
 uint32_t pal_pcie_get_dma_support(uint32_t seg, uint32_t bus, uint32_t dev, uint32_t fn);
@@ -726,6 +742,14 @@ typedef struct {
   uint64_t  dram_size;
   MEM_INFO_BLOCK  info[];
 } MEMORY_INFO_TABLE;
+
+typedef struct IOREMMAP_LIST{
+    uint64_t phy_addr;
+    uint64_t vir_addr;
+    uint64_t size;
+    uint64_t attr;
+    struct IOREMMAP_LIST *next;
+} IOREMMAP_LIST;
 
 void  pal_memory_create_info_table(MEMORY_INFO_TABLE *memoryInfoTable);
 uint32_t pal_memory_ioremap(void *addr, uint32_t size, uint32_t attr, void **baseptr);
@@ -1040,7 +1064,8 @@ typedef enum {
   @return  None
 **/
 void pal_pmu_create_info_table(PMU_INFO_TABLE *PmuTable);
-uint32_t pal_pmu_get_event_info(PMU_EVENT_TYPE_e event_type, PMU_NODE_INFO_TYPE node_type);
+uint32_t pal_pmu_get_event_info(uint32_t node_index, PMU_EVENT_TYPE_e event_type,
+                                PMU_NODE_INFO_TYPE node_type);
 uint32_t pal_pmu_get_multi_traffic_support_interface(uint64_t *interface_acpiid,
                                                        uint32_t *num_traffic_type_support);
 uint32_t pal_generate_traffic(uint64_t interface_acpiid, uint32_t pmu_node_index,

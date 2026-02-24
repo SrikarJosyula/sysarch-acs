@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2016-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,6 +117,19 @@ typedef struct {
   PE_INFO_HDR    header;
   PE_INFO_ENTRY  pe_info[];
 }PE_INFO_TABLE;
+
+/**
+  @brief  MMU configuration structure for secondary PE initialization
+          This structure holds the primary PE's MMU configuration which
+          is used to enable MMU/caches on secondary PEs.
+**/
+typedef struct {
+  UINT64 ttbr0;      ///< Translation Table Base Register 0
+  UINT64 tcr;        ///< Translation Control Register
+  UINT64 mair;       ///< Memory Attribute Indirection Register
+  UINT64 sctlr;      ///< System Control Register
+  UINT32 current_el; ///< Current Exception Level (1 or 2)
+} PE_MMU_CONFIG;
 
 /**
   @brief  Instance of smbios type 4 processor info

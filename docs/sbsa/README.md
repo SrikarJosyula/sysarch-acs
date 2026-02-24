@@ -189,6 +189,8 @@ The details of the hardware or Verification IP which enable these exerciser test
 
 - The MPAM MSC PCC (ACPI Platform Communication Channel) support has been implemented but not yet verified on any platform. Please raise an issue if any failures or errors are encountered during the ACS run.
 
+- S_L8PE_06 requires BRBE to be enabled for Non-Secure EL2 (ENABLE_BRBE_FOR_NS) in TF-A; otherwise EL2 access to BRBE registers traps to EL3.
+
  #### Tests dependencies
  - MPAM tests will require EL3 firmware to enable access to MPAM registers from lower EL's.
    If arm trusted firmware is used as EL3 fimrware, enable ENABLE_MPAM_FOR_LOWER_ELS=1 during arm TF build.

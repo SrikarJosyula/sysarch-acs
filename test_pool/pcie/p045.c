@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2016-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2016-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,7 +141,8 @@ next_bdf:
           val_print(ACS_PRINT_DEBUG, "\n       Class code is 0x%x", reg_value);
           base_cc = reg_value >> TYPE01_BCC_SHIFT;
           if (g_pcie_skip_dp_nic_ms &&
-              ((base_cc == CNTRL_CC) || (base_cc == DP_CNTRL_CC) || (base_cc == MAS_CC))) {
+              ((base_cc == UNCLAS_CC) || (base_cc == CNTRL_CC)
+              || (base_cc == DP_CNTRL_CC) || (base_cc == MAS_CC))) {
               val_print(ACS_PRINT_DEBUG, "\n   Skipping BDF as  0x%x", bdf);
               tbl_index++;
               goto next_bdf;
@@ -214,6 +215,12 @@ next_bdf:
             val_print(ACS_PRINT_ERR,
                   "\n       pal_memory_ioremap not implemented, skipping test.", 0);
             goto test_skip_unimplemented;
+          }
+          else if (status) {
+            val_print(ACS_PRINT_ERR, "\n       Failed in  ioremap with status %x", status);
+            test_fail++;
+            val_set_status(index, RESULT_FAIL(test_num, test_fail));
+            goto next_bar;
           }
 
           test_skip = 0;

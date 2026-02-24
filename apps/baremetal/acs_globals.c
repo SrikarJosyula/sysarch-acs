@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2025-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,11 @@ uint32_t  g_its_init = 0;
 uint64_t  g_stack_pointer;
 uint64_t  g_exception_ret_addr;
 uint64_t  g_ret_addr;
+
+uint32_t  g_sbsa_level;
+uint32_t  g_execute_nist;
+uint64_t  g_el3_param_magic = 0;
+uint64_t  g_el3_param_addr  = 0;
 
 /* Rule-based execution: arch and filtering selections */
 RULE_ID_e *g_rule_list = NULL;

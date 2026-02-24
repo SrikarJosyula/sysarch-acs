@@ -69,8 +69,7 @@ The xBSA EFI binary is generated at:
 ### Linux application
 Follow the [Common Linux application guide](../common/linux_build.md) to build the
 shared ACS kernel modules and user applications. xBSA reuses `bsa_acs.ko`,
-`bsa_app`, `sbsa_acs.ko`, and `sbsa_app`; deploy the binaries that match the
-spec revisions you plan to validate alongside the xBSA UEFI binary.
+`bsa_app`, `sbsa_acs.ko`, `sbsa_app`, `pcbsa_acs.ko` and `pcbsa_app`; deploy the binaries that match the spec revisions you plan to validate alongside the xBSA UEFI binary.
 
 ## xBSA run steps
 

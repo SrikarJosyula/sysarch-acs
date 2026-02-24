@@ -1,5 +1,5 @@
 #/** @file
-# Copyright (c) 2016-2020,2021,2024-2025, Arm Limited or its affiliates. All rights reserved.
+# Copyright (c) 2016-2020,2021,2024-2026, Arm Limited or its affiliates. All rights reserved.
 # SPDX-License-Identifier : Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,7 @@ GCC_ASM_EXPORT (ArmReadIdPfr1)
 GCC_ASM_EXPORT (AA64ReadMmfr0)
 GCC_ASM_EXPORT (AA64ReadMmfr1)
 GCC_ASM_EXPORT (AA64ReadMmfr2)
+GCC_ASM_EXPORT (AA64ReadMmfr3)
 GCC_ASM_EXPORT (AA64ReadCtr)
 GCC_ASM_EXPORT (ArmReadMmfr0)
 GCC_ASM_EXPORT (AA64ReadIsar0)
@@ -176,6 +177,10 @@ ASM_PFX(AA64ReadMmfr1):
 
 ASM_PFX(AA64ReadMmfr2):
   mrs   x0, id_aa64mmfr2_el1
+  ret
+
+ASM_PFX(AA64ReadMmfr3):
+  mrs   x0, id_aa64mmfr3_el1
   ret
 
 ASM_PFX(AA64ReadCtr):
@@ -728,5 +733,70 @@ ASM_PFX(AA64ReadTrbPtrEl1):
   ret
 
 ASM_PFX(AA64IssueISB):
+  isb
+  ret
+
+// MMU register write functions for secondary PE initialization
+
+GCC_ASM_EXPORT (AA64WriteMair1)
+GCC_ASM_EXPORT (AA64WriteMair2)
+GCC_ASM_EXPORT (AA64WriteTcr1)
+GCC_ASM_EXPORT (AA64WriteTcr2)
+GCC_ASM_EXPORT (AA64WriteTtbr0El1)
+GCC_ASM_EXPORT (AA64WriteTtbr0El2)
+GCC_ASM_EXPORT (AA64WriteSctlr1)
+GCC_ASM_EXPORT (AA64WriteSctlr2)
+GCC_ASM_EXPORT (AA64TlbiVmalle1)
+GCC_ASM_EXPORT (AA64TlbiAlle2)
+
+ASM_PFX(AA64WriteMair1):
+  msr   mair_el1, x0           // write EL1 MAIR
+  isb
+  ret
+
+ASM_PFX(AA64WriteMair2):
+  msr   mair_el2, x0           // write EL2 MAIR
+  isb
+  ret
+
+ASM_PFX(AA64WriteTcr1):
+  msr   tcr_el1, x0            // write EL1 TCR
+  isb
+  ret
+
+ASM_PFX(AA64WriteTcr2):
+  msr   tcr_el2, x0            // write EL2 TCR
+  isb
+  ret
+
+ASM_PFX(AA64WriteTtbr0El1):
+  msr   ttbr0_el1, x0          // write EL1 TTBR0
+  isb
+  ret
+
+ASM_PFX(AA64WriteTtbr0El2):
+  msr   ttbr0_el2, x0          // write EL2 TTBR0
+  isb
+  ret
+
+ASM_PFX(AA64WriteSctlr1):
+  msr   sctlr_el1, x0          // write EL1 SCTLR
+  isb
+  ret
+
+ASM_PFX(AA64WriteSctlr2):
+  msr   sctlr_el2, x0          // write EL2 SCTLR
+  isb
+  ret
+
+ASM_PFX(AA64TlbiVmalle1):
+  tlbi  vmalle1                // Invalidate all EL1 TLB entries
+  dsb   sy
+  isb
+  ret
+
+ASM_PFX(AA64TlbiAlle2):
+  tlbi  alle2                  // Invalidate all EL2 TLB entries
+  dsb   sy
   isb
   ret

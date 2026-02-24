@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2025-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,146 +20,114 @@
 #include "val/include/acs_memory.h"
 
 #define TEST_NUM   (ACS_PFDI_TEST_NUM_BASE + 13)
-#define TEST_RULE  "R0076"
-#define TEST_DESC  "Execute all available Test Parts on PE    "
+#define TEST_RULE  "R0164"
+#define TEST_DESC  "Check PE Run with Start exceeds End       "
 
-#define RUN_ALL_TEST_PARTS -1
+static PFDI_RET_PARAMS *g_pfdi_status;
 
-PFDI_RET_PARAMS *g_pfdi_run_avail;
-
+/* Execute the invalid parameter scenario: start index > end index */
 static void
-pfdi_test_run(void)
+check_pe_test_run_start_exceeds_end(void)
 {
-  uint32_t index = val_pe_get_index_mpid(val_pe_get_mpid());
-  PFDI_RET_PARAMS *pfdi_buffer;
+    uint32_t index;
+    PFDI_RET_PARAMS *pfdi_buffer;
 
-  pfdi_buffer = g_pfdi_run_avail + index;
+    index = val_pe_get_index_mpid(val_pe_get_mpid());
+    pfdi_buffer = g_pfdi_status + index;
 
-  /* Invoke PFDI Run function for current PE index */
-  pfdi_buffer->x0 = val_pfdi_pe_test_run(RUN_ALL_TEST_PARTS, RUN_ALL_TEST_PARTS,
-                    &pfdi_buffer->x1, &pfdi_buffer->x2, &pfdi_buffer->x3, &pfdi_buffer->x4);
+    /* Execute invalid start > end case */
+    pfdi_buffer->x0 = val_pfdi_pe_test_run(1, 0,
+                             &pfdi_buffer->x1,
+                             &pfdi_buffer->x2,
+                             &pfdi_buffer->x3,
+                             &pfdi_buffer->x4);
 
-  val_pfdi_invalidate_ret_params(pfdi_buffer);
+    val_pfdi_invalidate_ret_params(pfdi_buffer);
 
-  val_set_status(index, RESULT_PASS(TEST_NUM, 1));
-  return;
+    val_set_status(index, RESULT_PASS(TEST_NUM, 1));
 }
 
-static void payload_run(void *arg)
+/* Validate that PFDI_PE_TEST_RUN returns INVALID_PARAMETERS for start > end */
+static void
+payload_check_pe_test_run_start_exceeds_end(void *arg)
 {
-  uint32_t index = val_pe_get_index_mpid(val_pe_get_mpid());
-  uint32_t timeout, i = 0, test_fail = 0, check_x1 = 0;
-  uint32_t num_pe = *(uint32_t *)arg;
-  PFDI_RET_PARAMS *pfdi_buffer;
+    uint32_t  num_pe = *((uint32_t *)arg);
+    uint32_t  index = val_pe_get_index_mpid(val_pe_get_mpid());
+    uint32_t  i = 0, timeout, test_fail = 0;
+    PFDI_RET_PARAMS *pfdi_buffer;
 
-
-  /* Allocate memory to save all PFDI run status and fault id's for all PE's */
-  g_pfdi_run_avail =
-            (PFDI_RET_PARAMS *) val_memory_calloc(num_pe, sizeof(PFDI_RET_PARAMS));
-  if (g_pfdi_run_avail == NULL) {
-    val_print(ACS_PRINT_ERR,
-                "\n       Allocation for PFDI Run Function Failed", 0);
-    val_set_status(index, RESULT_FAIL(TEST_NUM, 1));
-    return;
-  }
-
-  for (i = 0; i < num_pe; i++) {
-    pfdi_buffer = g_pfdi_run_avail + i;
-    val_pfdi_invalidate_ret_params(pfdi_buffer);
-  }
-
-  /* Invoke PFDI Run function for current PE index */
-  pfdi_test_run();
-
-  /* Execute pfdi_test_run function in All PE's */
-  for (i = 0; i < num_pe; i++) {
-    if (i != index) {
-      timeout = TIMEOUT_LARGE;
-      val_execute_on_pe(i, pfdi_test_run, 0);
-
-      while ((--timeout) && (IS_RESULT_PENDING(val_get_status(i))));
-
-      if (timeout == 0) {
-        val_print(ACS_PRINT_ERR, "\n       **Timed out** for PE index = %d", i);
-        val_set_status(i, RESULT_FAIL(TEST_NUM, 2));
-        goto free_pfdi_details;
-      }
+    g_pfdi_status = (PFDI_RET_PARAMS *)
+        val_memory_calloc(num_pe, sizeof(PFDI_RET_PARAMS));
+    if (g_pfdi_status == NULL) {
+        val_print(ACS_PRINT_ERR, "\n       Allocation for PFDI Run Function Failed", 0);
+        val_set_status(index, RESULT_FAIL(TEST_NUM, 1));
+        return;
     }
-  }
-  val_time_delay_ms(ONE_MILLISECOND);
 
-  /* Check return status of function for all PE's */
-  for (i = 0; i < num_pe; i++) {
-    pfdi_buffer = g_pfdi_run_avail + i;
-    val_pfdi_invalidate_ret_params(pfdi_buffer);
-    test_fail = 0;
-    check_x1  = 0;
+    check_pe_test_run_start_exceeds_end();
 
-    if (pfdi_buffer->x0 < PFDI_ACS_SUCCESS) {
-      if (pfdi_buffer->x0 == PFDI_ACS_FAULT_FOUND) {
-        if (pfdi_buffer->x1 == PFDI_ACS_UNKNOWN) {
-          val_print(ACS_PRINT_ERR, "\n       Fault in PFDI test part on PE %d ", i);
-          val_print(ACS_PRINT_ERR, "cannot be identified", 0);
-        } else {
-          val_print(ACS_PRINT_ERR, "\n       PFDI test part %lld ", pfdi_buffer->x1);
-          val_print(ACS_PRINT_ERR, "triggered the fault on PE %d", i);
+    for (i = 0; i < num_pe; i++) {
+        if (i != index) {
+            timeout = TIMEOUT_LARGE;
+            val_execute_on_pe(i, check_pe_test_run_start_exceeds_end, 0);
+
+            while ((--timeout) && (IS_RESULT_PENDING(val_get_status(i))));
+
+            if (timeout == 0) {
+                val_print(ACS_PRINT_ERR, "\n       **Timed out** for PE index = %d", i);
+                val_set_status(i, RESULT_FAIL(TEST_NUM, 2));
+                goto free_pfdi_details;
+            }
         }
-      } else if (pfdi_buffer->x0 == PFDI_ACS_ERROR) {
-        check_x1++;
-        val_print(ACS_PRINT_ERR,
-              "\n       PFDI Test parts have executed but failed to complete on PE %d", i);
-      } else {
-        val_print(ACS_PRINT_ERR,
-              "\n       PFDI PE Run function failed %lld ", pfdi_buffer->x0);
-        val_print(ACS_PRINT_ERR, "on PE  %d", i);
-        test_fail++;
-      }
-    } else {
-      check_x1++;
     }
 
-    if (check_x1) {
-      if (pfdi_buffer->x1 != 0) {
-        val_print(ACS_PRINT_ERR, "\n       Register X1 is not zero:", 0);
-        val_print(ACS_PRINT_ERR, " x1=0x%llx", pfdi_buffer->x1);
-        val_print(ACS_PRINT_ERR, "\n       Failed on PE = %d", i);
-        test_fail++;
-      }
-    }
+    val_time_delay_ms(ONE_MILLISECOND);
 
-    if ((pfdi_buffer->x2 != 0) || (pfdi_buffer->x3 != 0) || (pfdi_buffer->x4 != 0)) {
-      val_print(ACS_PRINT_ERR, "\n       Registers X2-X4 are not zero:", 0);
-      val_print(ACS_PRINT_ERR, " x2=0x%llx", pfdi_buffer->x2);
-      val_print(ACS_PRINT_ERR, " x3=0x%llx", pfdi_buffer->x3);
-      val_print(ACS_PRINT_ERR, " x4=0x%llx", pfdi_buffer->x4);
-      val_print(ACS_PRINT_ERR, "\n       Failed on PE = %d", i);
-      test_fail++;
-    }
+    /* Check return status of function for all PE's */
+    for (i = 0; i < num_pe; i++) {
+        pfdi_buffer = g_pfdi_status + i;
 
-    if (test_fail)
-      val_set_status(i, RESULT_FAIL(TEST_NUM, 4));
-    else
-      val_set_status(i, RESULT_PASS(TEST_NUM, 1));
-  }
+        val_pfdi_invalidate_ret_params(pfdi_buffer);
+
+        test_fail = 0;
+
+        if (pfdi_buffer->x0 != PFDI_ACS_INVALID_PARAMETERS) {
+            val_print(ACS_PRINT_ERR, "\n       Invalid parameter test failed on PE %d", i);
+            val_print(ACS_PRINT_ERR, " (expected -3, got %ld)", pfdi_buffer->x0);
+            test_fail++;
+        }
+
+        if ((pfdi_buffer->x1 != 0) || (pfdi_buffer->x2 != 0) ||
+            (pfdi_buffer->x3 != 0) || (pfdi_buffer->x4 != 0)) {
+            val_print(ACS_PRINT_ERR, "\n       Registers X1-X4 are not zero:", 0);
+            val_print(ACS_PRINT_ERR, " x1=0x%llx", pfdi_buffer->x1);
+            val_print(ACS_PRINT_ERR, " x2=0x%llx", pfdi_buffer->x2);
+            val_print(ACS_PRINT_ERR, " x3=0x%llx", pfdi_buffer->x3);
+            val_print(ACS_PRINT_ERR, " x4=0x%llx", pfdi_buffer->x4);
+            val_print(ACS_PRINT_ERR, "\n       Failed on PE = %d", i);
+            test_fail++;
+        }
+
+        if (test_fail)
+            val_set_status(i, RESULT_FAIL(TEST_NUM, 3));
+        else
+            val_set_status(i, RESULT_PASS(TEST_NUM, 1));
+    }
 
 free_pfdi_details:
-  val_memory_free((void *) g_pfdi_run_avail);
-
-  return;
+    val_memory_free((void *)g_pfdi_status);
 }
 
+/* Entry point for test PFDI013 */
 uint32_t pfdi013_entry(uint32_t num_pe)
 {
-  uint32_t status = ACS_STATUS_FAIL;
+    uint32_t status;
 
-  status = val_initialize_test(TEST_NUM, TEST_DESC, num_pe);
+    status = val_initialize_test(TEST_NUM, TEST_DESC, num_pe);
+    if (status != ACS_STATUS_SKIP)
+        val_run_test_configurable_payload(&num_pe, payload_check_pe_test_run_start_exceeds_end);
 
-  if (status != ACS_STATUS_SKIP)
-    val_run_test_configurable_payload(&num_pe, payload_run);
-
-  /* get the result from all PE and check for failure */
-  status = val_check_for_error(TEST_NUM, num_pe, TEST_RULE);
-  val_report_status(0, ACS_END(TEST_NUM), NULL);
-
-  return status;
+    status = val_check_for_error(TEST_NUM, num_pe, TEST_RULE);
+    val_report_status(0, ACS_END(TEST_NUM), NULL);
+    return status;
 }

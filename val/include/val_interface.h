@@ -270,6 +270,8 @@ void     val_pcie_enable_msa(uint32_t bdf);
 void     val_pcie_clear_urd(uint32_t bdf);
 void     val_pcie_enable_eru(uint32_t bdf);
 void     val_pcie_disable_eru(uint32_t bdf);
+void     val_pcie_enable_dpc(uint32_t bdf, uint32_t err_type);
+void     val_pcie_disable_dpc(uint32_t bdf);
 void     val_pcie_get_mmio_bar(uint32_t bdf, void *base);
 void     val_pcie_read_acsctrl(uint32_t arr[][1]);
 void     val_pcie_write_acsctrl(uint32_t arr[][1]);
@@ -461,6 +463,7 @@ void     val_mmap_add_region(uint64_t va_base, uint64_t pa_base,
                              uint64_t length, uint64_t attributes);
 uint32_t val_setup_mmu(void);
 uint32_t val_enable_mmu(void);
+void val_setup_mair_register(void);
 
 /* Identify memory type using MAIR attribute, refer to ARM ARM VMSA for details */
 
@@ -555,6 +558,7 @@ typedef enum {
 
 uint32_t val_ras_create_info_table(uint64_t *ras_info_table);
 uint32_t val_ras_get_info(uint32_t info_type, uint32_t param1, uint64_t *ret_data);
+void val_ras_free_info_table(void);
 void val_ras2_create_info_table(uint64_t *ras2_info_table);
 void val_ras2_free_info_table(void);
 uint64_t val_ras2_get_mem_info(RAS2_MEM_INFO_e type, uint32_t index);
@@ -847,7 +851,7 @@ val_pfdi_verify_regs(ARM_SMC_ARGS *args, int32_t conduit,
               uint64_t post_smc_regs[REG_COUNT_X5_X17]);
 void val_pfdi_invalidate_ret_params(PFDI_RET_PARAMS *args);
 
-uint32_t val_pfdi_execute_pfdi_tests(uint32_t num_pe);
+uint32_t val_pfdi_check_implementation(void);
 
 uint32_t pfdi001_entry(uint32_t num_pe);
 uint32_t pfdi002_entry(uint32_t num_pe);
@@ -866,5 +870,19 @@ uint32_t pfdi014_entry(uint32_t num_pe);
 uint32_t pfdi015_entry(uint32_t num_pe);
 uint32_t pfdi016_entry(uint32_t num_pe);
 uint32_t pfdi017_entry(uint32_t num_pe);
+uint32_t pfdi018_entry(uint32_t num_pe);
+uint32_t pfdi019_entry(uint32_t num_pe);
+uint32_t pfdi020_entry(uint32_t num_pe);
+uint32_t pfdi021_entry(uint32_t num_pe);
+uint32_t pfdi022_entry(uint32_t num_pe);
+uint32_t pfdi023_entry(uint32_t num_pe);
+uint32_t pfdi024_entry(uint32_t num_pe);
+uint32_t pfdi025_entry(uint32_t num_pe);
+uint32_t pfdi026_entry(uint32_t num_pe);
+uint32_t pfdi027_entry(uint32_t num_pe);
+uint32_t pfdi028_entry(uint32_t num_pe);
+uint32_t pfdi029_entry(uint32_t num_pe);
+uint32_t pfdi030_entry(uint32_t num_pe);
+uint32_t pfdi031_entry(uint32_t num_pe);
 
 #endif

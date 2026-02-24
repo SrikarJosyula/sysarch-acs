@@ -1,5 +1,5 @@
 /** @file
- * Copyright (c) 2023-2025, Arm Limited or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2026, Arm Limited or its affiliates. All rights reserved.
  * SPDX-License-Identifier : Apache-2.0
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,8 +108,9 @@ payload(void)
           goto test_skip_unimplemented;
         }
 
-        if (!baseptr) {
+        if (status) {
             val_print(ACS_PRINT_ERR, "\n       Failed in BAR ioremap for instance %x", instance);
+            val_print(ACS_PRINT_DEBUG, "   Status :0x%x", status);
             goto test_fail;
         }
 

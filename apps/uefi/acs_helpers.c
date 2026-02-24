@@ -949,7 +949,10 @@ command_init (void)
     }
 
     if (ShellCommandLineGetFlag (ParamPackage, L"-el1physkip")) {
-        g_el1physkip = TRUE;
+        /* Flag is applicable when ACS is running at EL1 */
+        if (val_pe_reg_read(CurrentEL) == AARCH64_EL1) {
+            g_el1physkip = TRUE;
+        }
     }
 
     return 0;
