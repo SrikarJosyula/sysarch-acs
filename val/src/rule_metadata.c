@@ -2053,7 +2053,7 @@ rule_test_map_t rule_test_map[RULE_ID_SENTINEL] = {
             .rule_desc        = "Arrival order & Gathering Check - RCiEP, iEP EP",
             .platform_bitmask = PLATFORM_BAREMETAL | PLATFORM_UEFI,
             .flag             = BASE_RULE,
-            .test_num         = ACS_PE_TEST_NUM_BASE  +  21,
+            .test_num         = ACS_EXERCISER_TEST_NUM_BASE  +  21,
         },
         [RE_ORD_4] = {
             .test_entry_id    = E008_ENTRY,
@@ -2061,7 +2061,7 @@ rule_test_map_t rule_test_map[RULE_ID_SENTINEL] = {
             .rule_desc        = "Tx pending bit clear correctness - RCiEP",
             .platform_bitmask = PLATFORM_BAREMETAL | PLATFORM_UEFI,
             .flag             = BASE_RULE,
-            .test_num         = ACS_PE_TEST_NUM_BASE  +  8,
+            .test_num         = ACS_EXERCISER_TEST_NUM_BASE  +  8,
         },
         [RE_PCI_1] = {
             .test_entry_id    = P085_ENTRY,
@@ -2178,7 +2178,7 @@ rule_test_map_t rule_test_map[RULE_ID_SENTINEL] = {
             .rule_desc        = "Check Inbound writes seen in order",
             .platform_bitmask = PLATFORM_BAREMETAL | PLATFORM_UEFI,
             .flag             = BASE_RULE,
-            .test_num         = ACS_PE_TEST_NUM_BASE + 26,
+            .test_num         = ACS_EXERCISER_TEST_NUM_BASE + 26,
         },
         [S_PCIe_08] = {
             .test_entry_id    = E032_ENTRY,
@@ -2186,7 +2186,7 @@ rule_test_map_t rule_test_map[RULE_ID_SENTINEL] = {
             .rule_desc        = "Check ordered writes flush prev writes",
             .platform_bitmask = PLATFORM_BAREMETAL | PLATFORM_UEFI,
             .flag             = BASE_RULE,
-            .test_num         = ACS_PE_TEST_NUM_BASE  +  32,
+            .test_num         = ACS_EXERCISER_TEST_NUM_BASE  +  32,
         },
         [B_PCIe_10] = {
             .test_entry_id    = E030_ENTRY,
@@ -3709,6 +3709,7 @@ test_entry_fn_t test_entry_func_table[TEST_ENTRY_SENTINEL] = {
     [CXL002_ENTRY] = cxl002_entry,
     [CXL003_ENTRY] = cxl003_entry,
     [CXL004_ENTRY] = cxl004_entry,
+    [GPU_04_ENTRY] = gpu_04_entry,
 #endif /* BAREMETAL_BSA_BUILD */
     [PE037_ENTRY] = pe037_entry,
     [PE043_ENTRY] = pe043_entry,
